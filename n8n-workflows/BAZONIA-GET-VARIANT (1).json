@@ -1,0 +1,131 @@
+{
+  "name": "BAZONIA-GET-VARIANT",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bazonia-get-variant",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        256,
+        304
+      ],
+      "webhookId": "bazonia-get-variant"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.zinc.io/v1/products/{{ $json.body.asin || $json.body.parent_asin }}?retailer={{ $json.body.store || 'amazon' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "zinc_request",
+      "name": "ZINC API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        304
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "BLFEsx4tGfn4W5GK",
+          "name": "ZINC Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// BAZONIA-GET-VARIANT - Format Response v2.1\n// Compatible con v1.4.7 y v1.4.9\n// Incluye: stock (both formats), stars, precio lista, descuento, reviews\n\nconst zinc = $input.first().json;\n\n// Precio actual (ZINC devuelve en centavos)\nconst price = zinc.price ? zinc.price / 100 : 0;\n\n// Precio lista original (ZINC devuelve en centavos)\n// NOTA: original_retail_price a veces viene mal de ZINC, usamos list_price como backup\nlet originalPrice = 0;\nif (zinc.list_price && zinc.list_price > zinc.price) {\n    originalPrice = zinc.list_price / 100;\n} else if (zinc.original_retail_price && zinc.original_retail_price > zinc.price) {\n    originalPrice = zinc.original_retail_price / 100;\n}\n\n// Calcular descuento\nlet discount = 0;\nlet discountPercent = 0;\nif (originalPrice > price && price > 0) {\n    discount = originalPrice - price;\n    discountPercent = Math.round((discount / originalPrice) * 100);\n}\n\n// Stock: num_offers > 0 significa disponible\nconst isAvailable = (zinc.num_offers && zinc.num_offers > 0) || false;\n\n// Stars: puede ser string \"4.5 out of 5 stars\" o número o null\nlet stars = null;\nlet starsNumeric = 0;\nif (zinc.stars) {\n    if (typeof zinc.stars === 'string') {\n        const match = zinc.stars.match(/^([\\d.]+)/);\n        if (match) starsNumeric = parseFloat(match[1]);\n    } else if (typeof zinc.stars === 'number') {\n        starsNumeric = zinc.stars;\n    }\n    stars = zinc.stars;\n}\n\n// Peso en kg (convertir de libras)\nlet weightKg = 0;\nif (zinc.package_dimensions?.weight?.amount) {\n    weightKg = zinc.package_dimensions.weight.amount * 0.453592;\n}\n\nreturn [{\n    json: {\n        // Identificadores\n        asin: zinc.product_id || zinc.asin,\n        parent_asin: zinc.parent_asin || null,\n        retailer: zinc.retailer || 'amazon',\n        \n        // Precios\n        price: price,\n        original_price: originalPrice > price ? originalPrice : null,\n        discount: discount > 0 ? discount : null,\n        discount_percent: discountPercent > 0 ? discountPercent : null,\n        \n        // Stock - BOTH formats for compatibility\n        available: isAvailable,      // v1.4.7 format\n        in_stock: isAvailable,       // v1.4.9 format\n        num_offers: zinc.num_offers || 0,\n        \n        // Reviews\n        stars: stars,\n        stars_numeric: starsNumeric,\n        review_count: zinc.review_count || 0,\n        \n        // Producto\n        title: zinc.title || '',\n        image: zinc.main_image || '',\n        images: zinc.images || [],\n        brand: zinc.brand || '',\n        \n        // Dimensiones y peso\n        weight_kg: weightKg,\n        dimensions: zinc.package_dimensions || null,\n        \n        // Metadata\n        timestamp: new Date().toISOString()\n    }\n}];"
+      },
+      "id": "format_response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "ZINC API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZINC API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "3d844129-f3f5-4b6b-84d5-4233d58076ab",
+  "meta": {
+    "instanceId": "832c4e1642799b64ac374a10fcf1f386b11a4717b8220e7b2c011e61163ab890"
+  },
+  "id": "SNNTNZuZrnCcMBKw",
+  "tags": []
+}

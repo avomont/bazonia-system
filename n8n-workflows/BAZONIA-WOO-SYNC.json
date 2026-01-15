@@ -1,0 +1,957 @@
+{
+  "name": "BAZONIA-WOO-SYNC",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -16
+      ],
+      "id": "3a29fabf-d8e0-4e0b-9d3e-aad6ecce3e70",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        144,
+        -16
+      ],
+      "id": "1cf06b78-88ee-4d80-9f4d-52fff1589cff",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "909bebc4-6d08-4512-b077-9240c50d6c73",
+              "leftValue": "={{ $json.existsInWoo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        112
+      ],
+      "id": "0d1d1f49-f233-4db6-81f4-3ba43e538550",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU",
+          "mode": "list",
+          "cachedResultName": "CARGO - DATA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1936635904,
+          "mode": "list",
+          "cachedResultName": "MASTER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU/edit#gid=1936635904"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.id }}",
+            "sync_log": "={{ $json.id ? 'synced' : 'error' }}",
+            "sync_timestamp": "={{ new Date().toISOString() }}",
+            "sync_status": "Ok",
+            "SKU": "={{ $json.sku }}"
+          },
+          "matchingColumns": [
+            "SKU"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "SKU",
+              "displayName": "SKU",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Published",
+              "displayName": "Published",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Is featured?",
+              "displayName": "Is featured?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Visibility in catalog",
+              "displayName": "Visibility in catalog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Short description",
+              "displayName": "Short description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tax status",
+              "displayName": "Tax status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "In stock?",
+              "displayName": "In stock?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Backorders allowed?",
+              "displayName": "Backorders allowed?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sold individually?",
+              "displayName": "Sold individually?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Weight (kg)",
+              "displayName": "Weight (kg)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Length (cm)",
+              "displayName": "Length (cm)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Width (cm)",
+              "displayName": "Width (cm)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Height (cm)",
+              "displayName": "Height (cm)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Regular price",
+              "displayName": "Regular price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Categories",
+              "displayName": "Categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tags",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Images",
+              "displayName": "Images",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 1 name",
+              "displayName": "Attribute 1 name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 1 value(s)",
+              "displayName": "Attribute 1 value(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 1 visible",
+              "displayName": "Attribute 1 visible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 1 global",
+              "displayName": "Attribute 1 global",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 2 name",
+              "displayName": "Attribute 2 name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 2 value(s)",
+              "displayName": "Attribute 2 value(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 2 visible",
+              "displayName": "Attribute 2 visible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 2 global",
+              "displayName": "Attribute 2 global",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 3 name",
+              "displayName": "Attribute 3 name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 3 value(s)",
+              "displayName": "Attribute 3 value(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 3 visible",
+              "displayName": "Attribute 3 visible",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attribute 3 global",
+              "displayName": "Attribute 3 global",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_asin",
+              "displayName": "meta:_bazonia_asin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_parent_asin",
+              "displayName": "meta:_bazonia_parent_asin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_brand",
+              "displayName": "meta:_bazonia_brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_upc",
+              "displayName": "meta:_bazonia_upc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_url",
+              "displayName": "meta:_bazonia_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_prime",
+              "displayName": "meta:_bazonia_prime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_has_variants",
+              "displayName": "meta:_bazonia_has_variants",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_variants_count",
+              "displayName": "meta:_bazonia_variants_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_variants_json",
+              "displayName": "meta:_bazonia_variants_json",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_last_sync",
+              "displayName": "meta:_bazonia_last_sync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_parser",
+              "displayName": "meta:_bazonia_parser",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_stars",
+              "displayName": "meta:_bazonia_stars",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta:_bazonia_reviews_count",
+              "displayName": "meta:_bazonia_reviews_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sync_status",
+              "displayName": "sync_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_log",
+              "displayName": "sync_log",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sync_timestamp",
+              "displayName": "sync_timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        96
+      ],
+      "id": "68dc4500-3106-401a-b059-5523134c7788",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EEUhtC7sFK3RuUT6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU",
+          "mode": "list",
+          "cachedResultName": "CARGO - DATA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1936635904,
+          "mode": "list",
+          "cachedResultName": "MASTER",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uq4w6ybVS26Hl3-tbbfOOQFShIcPO_EAfdCBbLuAAkU/edit#gid=1936635904"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "7da252fb-28d7-446d-9332-afdae8f65ca5",
+      "name": "MASTER - SHEET",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EEUhtC7sFK3RuUT6",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "product",
+        "operation": "update",
+        "productId": "={{ $json.id }}",
+        "updateFields": {
+          "description": "={{ $('Loop Over Items').item.json.Description }}",
+          "regularPrice": "={{ $json.regular_price }}"
+        },
+        "dimensionsUi": {},
+        "imagesUi": {},
+        "metadataUi": {}
+      },
+      "type": "n8n-nodes-base.wooCommerce",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -32
+      ],
+      "id": "999305a9-e2ba-46a4-bff8-448d8506ba09",
+      "name": "WooCommerce - Update Product",
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "IvW0uUUHvTTAgge7",
+          "name": "WOO - n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "product",
+        "operation": "create",
+        "name": "={{ $('Loop Over Items').item.json.Name }}",
+        "additionalFields": {
+          "description": "={{ $('Loop Over Items').item.json.Description }}",
+          "regularPrice": "={{ $('Loop Over Items').item.json['Regular price'] }}",
+          "sku": "={{ $('Loop Over Items').item.json.SKU }}",
+          "status": "publish",
+          "type": "={{ $('Loop Over Items').item.json.Type }}"
+        },
+        "dimensionsUi": {},
+        "imagesUi": {},
+        "metadataUi": {}
+      },
+      "type": "n8n-nodes-base.wooCommerce",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        160
+      ],
+      "id": "95263ef7-fa78-4da6-a1f0-c2e7c7dca17f",
+      "name": "WooCommerce - Create Product",
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "IvW0uUUHvTTAgge7",
+          "name": "WOO - n8n"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        96
+      ],
+      "id": "50c6aab7-7813-47b5-bf11-72fac4f1b665",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://bazonia.sermasivo.com/wp-json/wp/v2/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        -208
+      ],
+      "id": "2a29e2b6-d651-4fdd-be28-a0f935c7d060",
+      "name": "Upload Images",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "tKeqZKPjAKJMt8f2",
+          "name": "WORDPRESS - 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://bazonia.sermasivo.com/wp-json/wc/v3/products",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sku",
+              "value": "={{ $json.SKU }}"
+            },
+            {
+              "name": "per_page",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        512,
+        -288
+      ],
+      "id": "f9515697-a1aa-4ec4-bc6e-f15e5ecbda79",
+      "name": "Search by SKU",
+      "alwaysOutputData": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "4oa5zDmLBrcO31Br",
+          "name": "WooCommerce API - Bazonia"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        576,
+        -16
+      ],
+      "id": "9f738e74-5452-4dd2-a56e-c5be8d50d0b6",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "options": {
+          "sku": "={{ $json.SKU }}"
+        }
+      },
+      "type": "n8n-nodes-base.wooCommerce",
+      "typeVersion": 1,
+      "position": [
+        560,
+        144
+      ],
+      "id": "0bd1dd5f-f739-4b3a-9291-6905ae5dbfda",
+      "name": "WooCommerce - Search Product",
+      "alwaysOutputData": false,
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "IvW0uUUHvTTAgge7",
+          "name": "WOO - n8n"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "MASTER - SHEET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "WooCommerce - Search Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "WooCommerce - Update Product",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WooCommerce - Create Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MASTER - SHEET": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WooCommerce - Create Product": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "WooCommerce - Update Product": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search by SKU": {
+      "main": [
+        []
+      ]
+    },
+    "Merge1": {
+      "main": [
+        []
+      ]
+    },
+    "WooCommerce - Search Product": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Caracas"
+  },
+  "versionId": "b4036fcc-47a9-409b-8372-a7470551322d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "832c4e1642799b64ac374a10fcf1f386b11a4717b8220e7b2c011e61163ab890"
+  },
+  "id": "TJlCAEh6rJVqt4ll",
+  "tags": []
+}
