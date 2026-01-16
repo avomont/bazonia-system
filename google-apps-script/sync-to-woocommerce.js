@@ -1031,7 +1031,7 @@ function createAllCategories() {
       const cats = listWooCategories();
       const parent = cats.find(c => 
         String(c.name).toLowerCase().trim() === parentName.toLowerCase().trim() &&
-        Number(c.parent || 0) === 0
+        true
       );
       parentId = parent ? parent.id : 0;
     }
