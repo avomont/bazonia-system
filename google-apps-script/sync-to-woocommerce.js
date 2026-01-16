@@ -40,11 +40,11 @@ function onOpen() {
     .addItem('📊 Estadísticas', 'showStats')
     .addItem('🔄 Refrescar categorías', 'refreshCategories')
     .addItem('🏷️ Refrescar brands', 'refreshBrands')
+        .addItem('📁 Crear TODAS las categorías', 'createAllCategories')
     .addToUi();
 }
 
 function stopSync() {
-        .addItem('📁 Crear TODAS las categorías', 'createAllCategories')
   PropertiesService.getScriptProperties().setProperty('BAZONIA_STOP', '1');
   SpreadsheetApp.getUi().alert('⏹ Sync se detendrá después del producto actual');
 }
