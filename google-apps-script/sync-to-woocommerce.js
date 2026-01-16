@@ -923,119 +923,174 @@ function doSync(sh, selectionRange) {
  * Crea todas las categorías del sheet CATEGORÍAS en WooCommerce
  * y llena automáticamente la columna woo_cat_id
  */
+// ==============================
+// AUTO-CREAR CATEGORÍAS EN WOOCOMMERCE (CORREGIDO)
+// ==============================
+
+/**
+ * Crea todas las categorías del sheet CATEGORÍAS en WooCommerce
+ * y llena automáticamente la columna woo_cat_id
+ * CORREGIDO: Maneja categorías con mismo nombre bajo diferentes padres
+ */
 function createAllCategories() {
-    const ss = SpreadsheetApp.getActive();
-    const sh = ss.getSheetByName(CATEGORIES_SHEET_NAME) || ss.getSheetByName('CATEGORIAS');
-
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName(CATEGORIES_SHEET_NAME) || ss.getSheetByName('CATEGORIAS');
+  
   if (!sh) {
-        SpreadsheetApp.getUi().alert('❌ No existe hoja CATEGORÍAS');
-        return;
+    SpreadsheetApp.getUi().alert('❌ No existe hoja CATEGORÍAS');
+    return;
   }
-
+  
   const data = sh.getDataRange().getValues();
-    if (!data || data.length < 2) {
-          SpreadsheetApp.getUi().alert('❌ No hay datos en CATEGORÍAS');
-          return;
-    }
-
-  const headers = data[0].map(h => String(h).trim());
-    const termIdx = headers.indexOf('term_name');
-    const parentIdx = headers.indexOf('parent_name');
-    let wooIdIdx = headers.indexOf('woo_cat_id');
-
-  if (termIdx < 0) {
-        SpreadsheetApp.getUi().alert('❌ Falta columna term_name');
-        return;
+  if (!data || data.length < 2) {
+    SpreadsheetApp.getUi().alert('❌ No hay datos en CATEGORÍAS');
+    return;
   }
-
+  
+  const headers = data[0].map(h => String(h).trim());
+  const termIdx = headers.indexOf('term_name');
+  const parentIdx = headers.indexOf('parent_name');
+  let wooIdIdx = headers.indexOf('woo_cat_id');
+  
+  if (termIdx < 0) {
+    SpreadsheetApp.getUi().alert('❌ Falta columna term_name');
+    return;
+  }
+  
   // Crear columna woo_cat_id si no existe
   if (wooIdIdx < 0) {
-        wooIdIdx = headers.length;
-        sh.getRange(1, wooIdIdx + 1).setValue('woo_cat_id');
+    wooIdIdx = headers.length;
+    sh.getRange(1, wooIdIdx + 1).setValue('woo_cat_id');
   }
-
+  
   // Refrescar cache de categorías
   WC_CATEGORIES_CACHE = null;
-    const existingCats = listWooCategories();
-
-  let created = 0, updated = 0, errors = 0;
-
+  listWooCategories();
+  
+  let created = 0, existed = 0, errors = 0;
+  
+  // Mapa local para trackear categorías creadas en esta sesión
+  // Key: "nombre|parentId", Value: woo_cat_id
+  const localCache = {};
+  
   // Primera pasada: categorías padre (sin parent_name)
   for (let i = 1; i < data.length; i++) {
-        const row = data[i];
-        const termName = String(row[termIdx] || '').trim();
-        const parentName = parentIdx >= 0 ? String(row[parentIdx] || '').trim() : '';
-
-      if (!termName || parentName) continue; // Solo padres en primera pasada
-
-      const result = createOrFindCategory(termName, 0, existingCats);
-        if (result.id) {
-                sh.getRange(i + 1, wooIdIdx + 1).setValue(result.id);
-                if (result.created) created++; else updated++;
-        } else {
-                errors++;
-        }
-        sleep(100);
+    const row = data[i];
+    const termName = String(row[termIdx] || '').trim();
+    const parentName = parentIdx >= 0 ? String(row[parentIdx] || '').trim() : '';
+    
+    if (!termName || parentName) continue; // Solo padres en primera pasada
+    
+    const cacheKey = termName.toLowerCase() + '|0';
+    
+    // Verificar si ya tiene ID en el sheet
+    const existingId = wooIdIdx < row.length ? String(row[wooIdIdx] || '').trim() : '';
+    if (existingId && !isNaN(Number(existingId))) {
+      localCache[cacheKey] = Number(existingId);
+      existed++;
+      continue;
+    }
+    
+    const result = createOrFindCategoryFixed(termName, 0);
+    if (result.id) {
+      sh.getRange(i + 1, wooIdIdx + 1).setValue(result.id);
+      localCache[cacheKey] = result.id;
+      if (result.created) created++; else existed++;
+    } else {
+      errors++;
+      Logger.log('❌ Error creando padre: ' + termName);
+    }
+    sleep(100);
   }
-
+  
   // Refrescar cache después de crear padres
   WC_CATEGORIES_CACHE = null;
-    const updatedCats = listWooCategories();
-
+  listWooCategories();
+  
   // Segunda pasada: categorías hijo (con parent_name)
   for (let i = 1; i < data.length; i++) {
-        const row = data[i];
-        const termName = String(row[termIdx] || '').trim();
-        const parentName = parentIdx >= 0 ? String(row[parentIdx] || '').trim() : '';
-
-      if (!termName || !parentName) continue; // Solo hijos en segunda pasada
-
-      // Buscar ID del padre
-      const parent = updatedCats.find(c => 
-                                            String(c.name).toLowerCase().trim() === parentName.toLowerCase().trim()
-                                          );
-        const parentId = parent ? parent.id : 0;
-
-      const result = createOrFindCategory(termName, parentId, updatedCats);
-        if (result.id) {
-                sh.getRange(i + 1, wooIdIdx + 1).setValue(result.id);
-                if (result.created) created++; else updated++;
-        } else {
-                errors++;
-        }
-        sleep(100);
-  }
-
-  SpreadsheetApp.getUi().alert(
-        `✅ Categorías procesadas\n\n` +
-        `🆕 Creadas: ${created}\n` +
-        `🔄 Existentes: ${updated}\n` +
-        `❌ Errores: ${errors}`
+    const row = data[i];
+    const termName = String(row[termIdx] || '').trim();
+    const parentName = parentIdx >= 0 ? String(row[parentIdx] || '').trim() : '';
+    
+    if (!termName || !parentName) continue; // Solo hijos en segunda pasada
+    
+    // Verificar si ya tiene ID en el sheet
+    const existingId = wooIdIdx < row.length ? String(row[wooIdIdx] || '').trim() : '';
+    if (existingId && !isNaN(Number(existingId))) {
+      existed++;
+      continue;
+    }
+    
+    // Buscar ID del padre en cache local primero
+    const parentCacheKey = parentName.toLowerCase() + '|0';
+    let parentId = localCache[parentCacheKey] || 0;
+    
+    // Si no está en cache local, buscar en WooCommerce
+    if (!parentId) {
+      const cats = listWooCategories();
+      const parent = cats.find(c => 
+        String(c.name).toLowerCase().trim() === parentName.toLowerCase().trim() &&
+        Number(c.parent || 0) === 0
       );
+      parentId = parent ? parent.id : 0;
+    }
+    
+    if (!parentId) {
+      Logger.log('⚠️ Padre no encontrado: ' + parentName + ' para ' + termName);
+      errors++;
+      continue;
+    }
+    
+    const cacheKey = termName.toLowerCase() + '|' + parentId;
+    
+    const result = createOrFindCategoryFixed(termName, parentId);
+    if (result.id) {
+      sh.getRange(i + 1, wooIdIdx + 1).setValue(result.id);
+      localCache[cacheKey] = result.id;
+      if (result.created) created++; else existed++;
+    } else {
+      errors++;
+      Logger.log('❌ Error creando hijo: ' + termName + ' bajo ' + parentName);
+    }
+    sleep(100);
+  }
+  
+  SpreadsheetApp.getUi().alert(
+    '✅ Categorías procesadas\n\n' +
+    '🆕 Creadas: ' + created + '\n' +
+    '🔄 Existentes: ' + existed + '\n' +
+    '❌ Errores: ' + errors
+  );
 }
 
-function createOrFindCategory(name, parentId, existingCats) {
-    // Buscar si ya existe
-  const existing = existingCats.find(c => 
-                                         String(c.name).toLowerCase().trim() === name.toLowerCase().trim() &&
-        Number(c.parent || 0) === parentId
-                                       );
-
+function createOrFindCategoryFixed(name, parentId) {
+  const cats = listWooCategories();
+  
+  // Buscar si ya existe CON EL MISMO PADRE
+  const existing = cats.find(c => 
+    String(c.name).toLowerCase().trim() === name.toLowerCase().trim() &&
+    Number(c.parent || 0) === Number(parentId)
+  );
+  
   if (existing) {
-        return { id: existing.id, created: false };
+    return { id: existing.id, created: false };
   }
-
-  // Crear nueva
-  const payload = parentId > 0 ? { name, parent: parentId } : { name };
-    const r = wcFetch(`${WC_URL}/wp-json/wc/v3/products/categories`, {
-          method: 'post',
-          payload: JSON.stringify(payload)
-    });
-
+  
+  // Crear nueva - SIEMPRE incluir parent aunque sea 0
+  const payload = { name: name, parent: Number(parentId) };
+  
+  const r = wcFetch(WC_URL + '/wp-json/wc/v3/products/categories', {
+    method: 'post',
+    payload: JSON.stringify(payload)
+  });
+  
   if (r.body && r.body.id) {
-        return { id: r.body.id, created: true };
+    // Invalidar cache para que se recargue
+    WC_CATEGORIES_CACHE = null;
+    return { id: r.body.id, created: true };
   }
-
-  Logger.log(`❌ Error creando categoría ${name}: ${r.bodyTxt}`);
-    return { id: null, created: false };
+  
+  Logger.log('❌ Error creando categoría ' + name + ' (parent:' + parentId + '): ' + r.bodyTxt);
+  return { id: null, created: false };
 }
