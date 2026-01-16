@@ -13,8 +13,8 @@
 // CONFIGURACIÓN
 // ==============================
 const WC_URL = 'https://bazonia.sermasivo.com';
-const WC_KEY = 'ck_3fe1547d345ca53eecc12fd9298a6d08814aa505';
-const WC_SECRET = 'cs_6a8241439a00b51afaf22bd328ae6eeab9d43117';
+const WC_KEY = 'ck_8f4045e8a2ac97eacec10865b822bdd04b48bc98';
+const WC_SECRET = 'cs_a243e248600a41e0af9a2cd299309d8dd2365f8f';
 
 // WordPress Application Password (para media upload)
 const WP_USER = 'avomont';
