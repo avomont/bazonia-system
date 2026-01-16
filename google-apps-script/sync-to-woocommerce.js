@@ -1,13 +1,9 @@
 /*************************************************************
- * BAZONIA_SYNC_MASTER v11.2 — 2025-01-01
- * SYNC GOOGLE SHEETS → WOOCOMMERCE
- * 
- * FIXES v11.1:
- *  - Brand como taxonomía WooCommerce (no tag)
- *  - Logs y timestamp funcionando correctamente
- *  - Optimización de velocidad (imágenes en paralelo conceptual)
- *  - Columnas de control visibles
+ * BAZONIA SYNC - Google Sheets → WooCommerce
+ * Repo: github.com/avomont/bazonia-system
+ * Historial de cambios: ver CHANGELOG.md o git log
  *************************************************************/
+
 
 // ==============================
 // CONFIGURACIÓN
